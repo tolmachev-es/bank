@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Wallet API
+  description: API for wallet operations
+  version: 1.0.0
+
+servers:
+  - url: /api/v1
+    description: API v1
+
+paths:
+  /wallet:
+    post:
+      summary: Зачисление или списание ДС
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletOperationDto"
+      responses:
+        '200':
+          description: "ok"
+        '404':
+          description: "Wallet not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseDto"
+        '422':
+          description: "Balance not enough"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseDto"
+
+  /wallet/{id}:
+    get:
+      summary: Получение баланса ДС
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID кошелька
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: "ok"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BalanceDto"
+        '404':
+          description: "Wallet not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseDto"
+
+components:
+  schemas:
+    WalletOperationDto:
+      type: object
+      required:
+        - walletId
+        - operationType
+        - amount
+      properties:
+        walletId:
+          type: string
+          format: uuid
+        operationType:
+          type: string
+          enum: [ DEPOSIT, WITHDRAW ]
+        amount:
+          type: number
+          description: Цена с точностью до 2 знаков (BigDecimal)
+          example: 1999.99
+
+    BalanceDto:
+      type: object
+      properties:
+        walletId:
+          type: string
+          format: uuid
+        balance:
+          type: number
+          description: Цена с точностью до 2 знаков (BigDecimal)
+          example: 1999.99
+
+    ErrorResponseDto:
+      type: object
+      properties:
+        error:
+          type: string
+        timestamp:
+          type: string

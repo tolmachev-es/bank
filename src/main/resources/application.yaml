@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: bank
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/bank_database}
+    username: ${SPRING_DATASOURCE_USERNAME:myuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:mypassword}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: {HIKARI_MAXIMUM_POOL_SIZE:50}
+      minimum-idle: {HIKARI_MINIMUM-IDLE:10}
+      connection-timeout: {HIKARI_CONNECTION_TIMEOUT:3000}
+      idle-timeout: {HIKARI_IDLE_TIMEOUT:6000}
+      max-lifetime: {HIKARI_MAX_LIFETIME:18000}
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    contexts: dev
+    drop-first: true
+    default-schema: public
+    parameters:
+      app_user: tolmachev
+
+wallet:
+  retry:
+    max-attempts: ${WALLET_RETRY_MAX_ATTEMPTS:5}
+    backoff-period: ${WALLET_RETRY_BACKOFF_MS:20}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,health,info
+
+server:
+  port: {SERVER_PORT:8080}
+  servlet:
+    context-path: /api/v1
